@@ -4,9 +4,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 
 
-class MainViewModel : ViewModel() {
+class MainViewModel(repository: AsteroidRepository) : ViewModel() {
     init {
-        Log.i("MainViewModel", "MainViewModel Created!!" )
+        Log.i("MainViewModel", "MainViewModel Created $repository!!" )
     }
 
     override fun onCleared() {

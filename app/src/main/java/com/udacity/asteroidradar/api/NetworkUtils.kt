@@ -1,6 +1,11 @@
 package com.udacity.asteroidradar.api
 
-import com.udacity.asteroidradar.database.Asteroid
+import android.annotation.SuppressLint
+import android.os.Build
+import android.widget.TextView
+import androidx.annotation.RequiresApi
+import androidx.recyclerview.widget.RecyclerView
+import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import org.json.JSONObject
 import java.text.SimpleDateFormat
@@ -42,6 +47,7 @@ fun parseAsteroidsJsonResult(jsonResult: JSONObject): ArrayList<Asteroid> {
     return asteroidList
 }
 
+@SuppressLint("NewApi")
 private fun getNextSevenDaysFormattedDates(): ArrayList<String> {
     val formattedDateList = ArrayList<String>()
 
@@ -55,3 +61,11 @@ private fun getNextSevenDaysFormattedDates(): ArrayList<String> {
 
     return formattedDateList
 }
+
+/**
+ * ViewHolder that holds a single [TextView].
+ *
+ * A ViewHolder holds a view for the [RecyclerView] as well as providing additional information
+ * to the RecyclerView such as where on the screen it was last drawn during scrolling.
+ */
+class TextItemViewHolder(val textView: TextView): RecyclerView.ViewHolder(textView)
