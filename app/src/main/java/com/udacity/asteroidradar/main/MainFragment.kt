@@ -13,12 +13,14 @@ class MainFragment : Fragment() {
 
     private val viewModel: MainViewModel by lazy {
 
-        ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+        ViewModelProvider(this, viewModelFactory)
+            .get(MainViewModel::class.java)
+
     }
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         val binding = FragmentMainBinding.inflate(inflater)
 
 
