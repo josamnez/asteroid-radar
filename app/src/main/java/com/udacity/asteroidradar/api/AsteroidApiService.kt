@@ -15,6 +15,10 @@ private val retrofit = Retrofit.Builder()
 
 interface AsteroidApiService{
 
+    @GET("neo/rest/v1/feed")
+    suspend fun getAsteroids(
+        @Query("api_key") api_key: String
+    ): String
 
     @GET("planetary/apod")
     suspend fun getPictureOfDay(

@@ -1,19 +1,21 @@
 package com.udacity.asteroidradar.main
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.AsteroidApiService
+import com.udacity.asteroidradar.database.getInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 
-class MainViewModel(repository: AsteroidRepository) : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application){
+
+    private val database = getInstance(application)
+    private val asteroidRepository = AsteroidRepository(database)
 
     // The internal MutableLiveData String that stores the status of the most recent request
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
@@ -22,11 +24,16 @@ class MainViewModel(repository: AsteroidRepository) : ViewModel() {
     val pictureOfDay: LiveData<PictureOfDay>
         get() = _pictureOfDay
 
+
     init {
         viewModelScope.launch {
             updatePictureOfDay()
+            asteroidRepository.refreshAsteroids()
         }
     }
+
+    val asteroid = asteroidRepository.allAsteroids
+
 
     private suspend fun updatePictureOfDay() {
         withContext(Dispatchers.IO) {
