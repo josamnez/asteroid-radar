@@ -41,12 +41,12 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
     textView.text = String.format(context.getString(R.string.km_s_unit_format), number)
 }
 
-
-@BindingAdapter("pictureUrl")
-fun bindUriToImage(imageView: ImageView, strUrl: String?) {
-    Picasso.with(imageView.context)
-        .load(strUrl)
-        .placeholder(R.drawable.placeholder_picture_of_day)
-        .error(R.drawable.placeholder_picture_of_day)
-        .into(imageView)
-}
+//
+//@BindingAdapter("pictureUrl")
+//fun bindUriToImage(imageView: ImageView, strUrl: String?) {
+//    Picasso.with(imageView.context)
+//        .load(strUrl)
+//        .placeholder(R.drawable.placeholder_picture_of_day)
+//        .error(R.drawable.placeholder_picture_of_day)
+//        .into(imageView)
+//}
