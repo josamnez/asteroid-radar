@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
  * objects that should be displayed on screen, or manipulated by the app.
  *
  * @see database for objects that are mapped to the database
- * @see api for objects that parse or prepare network calls
+ * @see network for objects that parse or prepare network calls
  */
 @Parcelize
 data class Asteroid(
