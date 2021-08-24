@@ -1,6 +1,5 @@
 package com.udacity.asteroidradar.database
 
-import androidx.lifecycle.Transformations.map
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.udacity.asteroidradar.Asteroid
@@ -35,8 +34,8 @@ fun List<DatabaseAsteroid>.asDomainModel(): List<Asteroid> {
     }
 }
 
-fun NetworkAsteroidContainer.asDatabaseModel(): Array<DatabaseAsteroid> {
-    return asteroids.map {
+fun List<Asteroid>.asDatabaseModel(): Array<DatabaseAsteroid> {
+    return map {
         DatabaseAsteroid(
             id = it.id,
             codename = it.codename,

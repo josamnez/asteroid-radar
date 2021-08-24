@@ -1,30 +1,109 @@
 package com.udacity.asteroidradar.ui
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.Constants.API_KEY
+import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.network.PictureOfDay
+import com.udacity.asteroidradar.network.Service
+import com.udacity.asteroidradar.repository.AsteroidsRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val asteroids = mutableListOf<Asteroid>()
+    private val database = getDatabase(application)
+    private val asteroidsRepository = AsteroidsRepository(database)
 
-    init {
-        for (i in 0 until 100) {
-            val asteroid = Asteroid(
-                1,
-                "12",
-                "Feb 31",
-                2.3,
-                3.4,
-                43.3,
-                212.2,
-                true
-            )
-            asteroids += asteroid
+    /**
+     * This is private to avoid exposing a way to set this value to observers.
+     */
+    private val _pictureOfDay = MutableLiveData<PictureOfDay>()
+    private val _goToAsteroidDetail = MutableLiveData<List<Asteroid>?>()
 
+    /**
+     * Views should use this to get access to the data.
+     */
+    val pictureOfDay: LiveData<PictureOfDay>
+        get() = _pictureOfDay
+
+    val goToAsteroidDetail: MutableLiveData<List<Asteroid>?>
+        get() = _goToAsteroidDetail
+
+        private var _filterAsteroid = MutableLiveData(FilterAsteroidDate.ALL)
+
+
+
+    val asteroidListing = Transformations.switchMap(_filterAsteroid) {
+        when (it!!) {
+            FilterAsteroidDate.WEEK -> asteroidsRepository.weekAsteroids
+            FilterAsteroidDate.TODAY -> asteroidsRepository.todayAsteroids
+            else -> asteroidsRepository.allAsteroids
         }
     }
 
+    /**
+     * init{} is called immediately when this ViewModel is created.
+     */
+    init {
+        viewModelScope.launch {
+            asteroidsRepository.refreshAsteroids()
+            refreshPictureOfDay()
+        }
+    }
+
+
+    fun onClickedAsteroid(asteroid: Asteroid) {
+        _goToAsteroidDetail.value = listOf(asteroid)
+    }
+
+    fun onNavigatedAsteroid() {
+        _goToAsteroidDetail.value = null
+    }
+
+    fun onDateChangeFilter(filter: FilterAsteroidDate) {
+        _filterAsteroid.postValue(filter)
+    }
+    /**
+     * Refresh data from network and pass it via LiveData. Use a coroutine launch to get to
+     * background thread.
+     */
+    private fun refreshPictureOfDay() = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            try {
+                _pictureOfDay.postValue(
+                    Service.Network.retrofitAsteroids.getPictureOfTheDay(API_KEY)
+                )
+            } catch (err: Exception) {
+                Log.e("refreshPictureOfDay", err.printStackTrace().toString())
+            }
+        }
+    }
+
+    /**
+     * Factory for constructing MainViewModel
+     */
+    class Factory(val app: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return MainViewModel(app) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewmodel")
+        }
+    }
+
+
+}
+
+enum class FilterAsteroidDate {
+    TODAY,
+    WEEK,
+    ALL
 }
 
 

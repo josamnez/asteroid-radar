@@ -2,67 +2,67 @@ package com.udacity.asteroidradar.ui
 
 import android.os.Bundle
 import android.view.*
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.fragment.findNavController
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
 class MainFragment : Fragment() {
 
-    private lateinit var asteroidRecyclerView: RecyclerView
-
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+        val activity = requireNotNull(this.activity) {
+            "You can only access the viewModel after onViewCreated()"
+        }
+
+        ViewModelProvider(
+            this,
+            MainViewModel.Factory(activity.application)
+        ).get(MainViewModel::class.java)
     }
 
+    private val asteroidAdapter = AsteroidAdapter(AsteroidAdapter.AsteroidListener { asteroid ->
+        viewModel.onClickedAsteroid(asteroid)
+    })
+
+    /**
+     * Called when the Fragment is ready to display content to the screen.
+     */
+
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
+        // Get a reference to the binding object and inflate the fragment views.
         val binding = FragmentMainBinding.inflate(inflater)
-
-        asteroidRecyclerView = binding.asteroidRecycler
-        asteroidRecyclerView.layoutManager = LinearLayoutManager(context)
 
         binding.lifecycleOwner = this
 
         binding.viewModel = viewModel
+
+        binding.asteroidRecycler.adapter = asteroidAdapter
+
+        viewModel.goToAsteroidDetail.observe(viewLifecycleOwner, { asteroid ->
+            if (asteroid != null) {
+                this.findNavController().navigate(MainFragmentDirections.actionShowDetail(asteroid))
+                viewModel.onNavigatedAsteroid()
+            }
+        })
 
         setHasOptionsMenu(true)
 
         return binding.root
     }
 
-    private inner class AsteroidViewHolder(view: RecyclerView): RecyclerView.ViewHolder(view){
-        val codenameTextView: TextView = itemView.findViewById(R.id.text_asteroid_codename)
-        val closeApproachTextView: TextView = itemView.findViewById(R.id.text_close_approach_date)
-        val hazardImageView: ImageView = itemView.findViewById(R.id.img_potentially_hazardous)
-    }
-
-    private inner class AsteroidAdapter(var asteroids: List<Asteroid>)
-        : RecyclerView.Adapter<AsteroidViewHolder>(){
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AsteroidViewHolder {
-            val view = layoutInflater.inflate(R.layout.asteroid_item, parent, false)
-            return AsteroidViewHolder(view as RecyclerView)
-        }
-
-        override fun getItemCount() = asteroids.size
-
-        override fun onBindViewHolder(holder: AsteroidViewHolder, position: Int) {
-            val asteroid = asteroids[position]
-            holder.apply {
-                codenameTextView.text = asteroid.codename
-                closeApproachTextView.text = asteroid.closeApproachDate
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.asteroidListing.observe(viewLifecycleOwner, { asteroid ->
+            asteroid.apply {
+                asteroidAdapter.submitList(this)
             }
-        }
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -71,8 +71,19 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        viewModel.onDateChangeFilter(
+            when (item.itemId) {
+                R.id.show_rent_menu -> {
+                    FilterAsteroidDate.TODAY
+                }
+                R.id.show_all_menu -> {
+                    FilterAsteroidDate.WEEK
+                }
+                else -> {
+                    FilterAsteroidDate.ALL
+                }
+            }
+        )
         return true
     }
-
-
 }

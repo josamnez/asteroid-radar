@@ -5,10 +5,13 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import com.udacity.asteroidradar.Constants.BASE_URL
 import kotlinx.coroutines.Deferred
+import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.Query
+import java.util.concurrent.TimeUnit
 
 class Service {
 
@@ -17,7 +20,10 @@ class Service {
      */
     interface AsteroidService{
         @GET("neo/rest/v1/feed")
-        fun getAsteroids(): Deferred<NetworkAsteroidContainer>
+        suspend fun getAsteroids(@Query("api_key") api_key: String): String
+
+        @GET("planetary/apod")
+        suspend fun getPictureOfTheDay(@Query("api_key") api_key: String): PictureOfDay
     }
 
     /**
@@ -32,14 +38,22 @@ class Service {
             .add(KotlinJsonAdapterFactory())
             .build()
 
+        private val okHttpClient: OkHttpClient = OkHttpClient.Builder()
+            .readTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .build()
+
         // Configure retrofit to parse JSON and use coroutines
         private val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
+            .client(okHttpClient)
+
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .build()
 
-        val retrofitAsteroids = retrofit.create(AsteroidService::class.java)
+        val retrofitAsteroids: AsteroidService = retrofit.create(AsteroidService::class.java)
+
     }
 }
