@@ -1,5 +1,6 @@
 package com.udacity.asteroidradar
 
+import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.BindingAdapter
@@ -45,9 +46,15 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
  * Binding adapter used to display images from URL using Picasso
  */
 @BindingAdapter("pictureUrl")
-fun bindUriToImage(imageView: ImageView, url: String) {
+fun bindUriToImage(imageView: ImageView, url: String?) {
     Picasso.with(imageView.context)
         .load(url)
         .placeholder(R.drawable.placeholder_picture_of_day)
+        .error(R.drawable.placeholder_picture_of_day)
         .into(imageView)
+}
+
+@BindingAdapter("loadingWheel")
+fun progressBar(view: View, it: Int){
+    view.visibility = if (it !=0 ) View.GONE else View.VISIBLE
 }

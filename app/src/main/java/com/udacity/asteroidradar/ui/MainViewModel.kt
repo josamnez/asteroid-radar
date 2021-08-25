@@ -1,12 +1,13 @@
 package com.udacity.asteroidradar.ui
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.*
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.database.getDatabase
-import com.udacity.asteroidradar.network.PictureOfDay
+import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.network.Service
 import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.Dispatchers
@@ -23,7 +24,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * This is private to avoid exposing a way to set this value to observers.
      */
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
-    private val _goToAsteroidDetail = MutableLiveData<Asteroid?>()
+    private val _goToAsteroidDetail = MutableLiveData<Asteroid>()
 
     /**
      * Views should use this to get access to the data.
@@ -31,7 +32,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val pictureOfDay: LiveData<PictureOfDay>
         get() = _pictureOfDay
 
-    val goToAsteroidDetail: MutableLiveData<Asteroid?>
+    val goToAsteroidDetail: MutableLiveData<Asteroid>
         get() = _goToAsteroidDetail
 
         private var _filterAsteroidDate = MutableLiveData(FilterAsteroidDate.ALL)
@@ -61,6 +62,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _goToAsteroidDetail.value = asteroid
     }
 
+    @SuppressLint("NullSafeMutableLiveData")
     fun onNavigatedAsteroid() {
         _goToAsteroidDetail.value = null
     }
