@@ -8,6 +8,7 @@ import androidx.lifecycle.Transformations
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.database.AsteroidsDatabase
+import com.udacity.asteroidradar.database.asDatabaseModel
 import com.udacity.asteroidradar.database.asDomainModel
 import com.udacity.asteroidradar.network.Service
 import com.udacity.asteroidradar.util.parseAsteroidsJsonResult
@@ -60,8 +61,8 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
         withContext(Dispatchers.IO) {
             try {
                 val asteroidsList = Service.Network.retrofitAsteroids.getAsteroids(API_KEY)
-                val result = parseAsteroidsJsonResult(JSONObject(asteroidsList))
-                database.asteroidDao.result(*asteroidsList.asDatabaseModel())
+                val listResult = parseAsteroidsJsonResult(JSONObject(asteroidsList))
+                database.asteroidDao.insertAll(*listResult.asDatabaseModel())
                 Log.d("Refresh Asteroids", "Success")
             } catch (err: Exception) {
                 Log.e("Failed: AsteroidRepFile", err.message.toString())

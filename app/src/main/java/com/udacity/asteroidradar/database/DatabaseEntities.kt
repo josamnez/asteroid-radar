@@ -3,7 +3,6 @@ package com.udacity.asteroidradar.database
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.udacity.asteroidradar.Asteroid
-import com.udacity.asteroidradar.network.NetworkAsteroidContainer
 
 
 @Entity(tableName = "asteroids_table")

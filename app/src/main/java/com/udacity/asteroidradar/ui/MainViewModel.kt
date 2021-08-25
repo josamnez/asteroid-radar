@@ -23,7 +23,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
      * This is private to avoid exposing a way to set this value to observers.
      */
     private val _pictureOfDay = MutableLiveData<PictureOfDay>()
-    private val _goToAsteroidDetail = MutableLiveData<List<Asteroid>?>()
+    private val _goToAsteroidDetail = MutableLiveData<Asteroid?>()
 
     /**
      * Views should use this to get access to the data.
@@ -31,14 +31,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val pictureOfDay: LiveData<PictureOfDay>
         get() = _pictureOfDay
 
-    val goToAsteroidDetail: MutableLiveData<List<Asteroid>?>
+    val goToAsteroidDetail: MutableLiveData<Asteroid?>
         get() = _goToAsteroidDetail
 
-        private var _filterAsteroid = MutableLiveData(FilterAsteroidDate.ALL)
+        private var _filterAsteroidDate = MutableLiveData(FilterAsteroidDate.ALL)
 
 
 
-    val asteroidListing = Transformations.switchMap(_filterAsteroid) {
+    val asteroidListing = Transformations.switchMap(_filterAsteroidDate) {
         when (it!!) {
             FilterAsteroidDate.WEEK -> asteroidsRepository.weekAsteroids
             FilterAsteroidDate.TODAY -> asteroidsRepository.todayAsteroids
@@ -58,7 +58,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun onClickedAsteroid(asteroid: Asteroid) {
-        _goToAsteroidDetail.value = listOf(asteroid)
+        _goToAsteroidDetail.value = asteroid
     }
 
     fun onNavigatedAsteroid() {
@@ -66,8 +66,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun onDateChangeFilter(filter: FilterAsteroidDate) {
-        _filterAsteroid.postValue(filter)
+        _filterAsteroidDate.postValue(filter)
     }
+
+    /**
+     * Factory for constructing MainViewModel
+     */
+    class Factory(val app: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return MainViewModel(app) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewmodel")
+        }
+    }
+
     /**
      * Refresh data from network and pass it via LiveData. Use a coroutine launch to get to
      * background thread.
@@ -84,26 +98,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /**
-     * Factory for constructing MainViewModel
-     */
-    class Factory(val app: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return MainViewModel(app) as T
-            }
-            throw IllegalArgumentException("Unable to construct viewmodel")
-        }
-    }
-
-
 }
 
 enum class FilterAsteroidDate {
-    TODAY,
-    WEEK,
-    ALL
+    TODAY, WEEK, ALL
 }
 
 
