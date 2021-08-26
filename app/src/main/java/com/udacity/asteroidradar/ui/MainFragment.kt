@@ -73,11 +73,11 @@ class MainFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         viewModel.onDateChangeFilter(
             when (item.itemId) {
+                R.id.show_all_menu -> {
+                    FilterAsteroidDate.NEXT_WEEK
+                }
                 R.id.show_rent_menu -> {
                     FilterAsteroidDate.TODAY
-                }
-                R.id.show_all_menu -> {
-                    FilterAsteroidDate.WEEK
                 }
                 else -> {
                     FilterAsteroidDate.ALL

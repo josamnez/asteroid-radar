@@ -32,7 +32,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val pictureOfDay: LiveData<PictureOfDay>
         get() = _pictureOfDay
 
-    val goToAsteroidDetail: MutableLiveData<Asteroid>
+    val goToAsteroidDetail: LiveData<Asteroid>
         get() = _goToAsteroidDetail
 
         private var _filterAsteroidDate = MutableLiveData(FilterAsteroidDate.ALL)
@@ -41,7 +41,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val asteroidListing = Transformations.switchMap(_filterAsteroidDate) {
         when (it!!) {
-            FilterAsteroidDate.WEEK -> asteroidsRepository.weekAsteroids
+            FilterAsteroidDate.NEXT_WEEK -> asteroidsRepository.weekAsteroids
             FilterAsteroidDate.TODAY -> asteroidsRepository.todayAsteroids
             else -> asteroidsRepository.allAsteroids
         }
@@ -103,7 +103,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 }
 
 enum class FilterAsteroidDate {
-    TODAY, WEEK, ALL
+    TODAY, NEXT_WEEK, ALL
 }
 
 
