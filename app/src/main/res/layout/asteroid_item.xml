@@ -24,6 +24,7 @@
             android:textColor="#FFFFFF"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:hint="@string/asteroid_name"
             app:layout_constraintStart_toStartOf="@+id/guidelineRight"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Title" />
@@ -38,6 +39,7 @@
             android:text="@{asteroid.closeApproachDate}"
             android:textColor="@color/default_text_color"
             android:textSize="16sp"
+            android:hint="@string/close_approach_data_title"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="@+id/text_asteroid_codename"
             app:layout_constraintTop_toBottomOf="@+id/text_asteroid_codename" />
