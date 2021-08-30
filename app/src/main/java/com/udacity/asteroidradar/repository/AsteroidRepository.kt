@@ -15,6 +15,7 @@ import com.udacity.asteroidradar.util.parseAsteroidsJsonResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -28,10 +29,10 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
      * Load asteroids that can be shown on the screen
      */
     @RequiresApi(Build.VERSION_CODES.O)
-    private val startDate = LocalDateTime.now()
+    private val startDate = LocalDate.now()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private val endDate = LocalDateTime.now().minusDays(7)
+    private val endDate = LocalDate.now().minusDays(7)
 
     val allAsteroids: LiveData<List<Asteroid>> =
         Transformations.map(database.asteroidDao.getAsteroids()) {
@@ -65,7 +66,7 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
                 database.asteroidDao.insertAll(*listResult.asDatabaseModel())
                 Log.d("Refresh Asteroids", "Success")
             } catch (err: Exception) {
-                Log.e("Failed: AsteroidRepFile", err.message.toString())
+                Log.e("Failed: Asteroid File", err.message.toString())
             }
         }
     }
