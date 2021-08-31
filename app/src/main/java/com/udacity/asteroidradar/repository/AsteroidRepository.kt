@@ -32,7 +32,7 @@ class AsteroidsRepository(private val database: AsteroidsDatabase) {
     private val startDate = LocalDate.now()
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private val endDate = LocalDate.now().minusDays(7)
+    private val endDate = LocalDate.now().plusDays(7)
 
     val allAsteroids: LiveData<List<Asteroid>> =
         Transformations.map(database.asteroidDao.getAsteroids()) {
